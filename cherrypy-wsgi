@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""This is just a little script for serving wsgi applications with CherryPy from the command line,
+i.e., without writing your own script for it. CherryPy already has `cherryd`, but it doesn't do 
+wsgi. Bleh.
+
+Stolen from http://docs.cherrypy.org/stable/refman/wsgiserver/init.html.
+"""
+
+import imp
+from cherrypy import wsgiserver
+
+def serve(module_name="test_app", app_name="app", port=8080):
+    """Given `module_name`, `app_name`, and `port`, import the module `module_name`, get its
+    attribute `app_name` (which should be a WSGI app), and serve it on port `port` with cherrypy."""
+    # import the module from the string of the module name.
+    imp.load_module("application_module", *imp.find_module("testapp"))
+    import application_module
+    # Get the app from the module.
+    app = getattr(application_module, app_name)
+    # and then make a CherryPyWSGIServer with this information, and start it.
+    server = wsgiserver.CherryPyWSGIServer(('0.0.0.0', port), app)
+    server.start()
+
+serve()
