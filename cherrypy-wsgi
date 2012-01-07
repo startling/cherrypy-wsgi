@@ -9,12 +9,19 @@ Stolen from http://docs.cherrypy.org/stable/refman/wsgiserver/init.html.
 
 import imp
 import os
+import sys
 from argparse import ArgumentParser
 from cherrypy import wsgiserver
 
 def serve(module_name, app_name, port, **kwargs):
     """Given `module_name`, `app_name`, and `port`, import the module `module_name`, get its
     attribute `app_name` (which should be a WSGI app), and serve it on port `port` with cherrypy."""
+    # Fork. If this is the parent process, os.fork() return's the child's process id,
+    # so the if loop evaluates to true and it quits. In the child process, os.fork() returns 0,
+    # so the child process keeps going.
+    if os.fork():
+        sys.exit()
+    # Everything after here is only done by the child process:
     # import the module from the string of the module name.
     imp.load_module("application_module", *imp.find_module("testapp"))
     import application_module
