@@ -28,9 +28,12 @@ def serve(module_name, app_name, port):
         print("Serving on port %d, process ID is %d." % (port, pid))
         sys.exit()
     # Everything after here is only done by the child process:
+    # prepend the current working directory to the path; by default, only the
+    # directory that the script lives in is added.
+    sys.path.insert(0, os.getcwd())
     # import the module from the string of the module name.
-    imp.load_module("application_module", *imp.find_module(module_name))
-    import application_module
+    application_module = __import__(module_name, 
+                                    globals(), locals(), [app_name], -1)
     # Get the app from the module.
     app = getattr(application_module, app_name)
     # and then make a CherryPyWSGIServer with this information
