@@ -29,7 +29,7 @@ def serve(module_name, app_name, port):
         sys.exit()
     # Everything after here is only done by the child process:
     # import the module from the string of the module name.
-    imp.load_module("application_module", *imp.find_module("testapp"))
+    imp.load_module("application_module", *imp.find_module(module_name))
     import application_module
     # Get the app from the module.
     app = getattr(application_module, app_name)
@@ -42,7 +42,7 @@ def serve(module_name, app_name, port):
 parser = ArgumentParser(add_help=True,
     description="Run a WSGI application with CherryPy from the command line.")
 
-parser.add_argument("module_name", type=str, nargs=1,
+parser.add_argument("module_name", type=str,
     help="The name of the module where your application lives.")
 
 parser.add_argument("app_name", type=str, nargs="?", default="app",
