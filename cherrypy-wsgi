@@ -8,9 +8,11 @@ Stolen from http://docs.cherrypy.org/stable/refman/wsgiserver/init.html.
 """
 
 import imp
+import os
+from argparse import ArgumentParser
 from cherrypy import wsgiserver
 
-def serve(module_name="test_app", app_name="app", port=8080):
+def serve(module_name, app_name, port, **kwargs):
     """Given `module_name`, `app_name`, and `port`, import the module `module_name`, get its
     attribute `app_name` (which should be a WSGI app), and serve it on port `port` with cherrypy."""
     # import the module from the string of the module name.
@@ -18,8 +20,25 @@ def serve(module_name="test_app", app_name="app", port=8080):
     import application_module
     # Get the app from the module.
     app = getattr(application_module, app_name)
-    # and then make a CherryPyWSGIServer with this information, and start it.
+    # and then make a CherryPyWSGIServer with this information
     server = wsgiserver.CherryPyWSGIServer(('0.0.0.0', port), app)
+    # print the port number and pid.
+    print("Serving on port %d, process ID is %d." %(port, os.getpid()))
+    # start the server.
     server.start()
 
-serve()
+# create an argparse parser...
+parser = ArgumentParser(description="Run a WSGI application with CherryPy from the command line.",
+        add_help=True)
+
+parser.add_argument("module_name", type=str, nargs=1,
+        help="The name of the module where your application lives.")
+
+parser.add_argument("app_name", type=str, nargs="?", default="app",
+        help="The name of your application, in `module_name`; defaults to 'app'.")
+
+parser.add_argument("--port", type=int, help="Port to serve on; defaults to 8080.", action="store",
+        nargs="?", default=8080)
+
+args = parser.parse_args()
+serve(**vars(args))
