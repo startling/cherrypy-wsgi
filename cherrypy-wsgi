@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""This is just a little script for serving wsgi applications with CherryPy from the command line,
-i.e., without writing your own script for it. CherryPy already has `cherryd`, but it doesn't do 
-wsgi. Bleh.
+"""This is just a little script for serving wsgi applications with CherryPy
+from the command line, i.e., without writing your own script for it. CherryPy
+already has `cherryd`, but it doesn't do wsgi. Bleh.
 
 Stolen from http://docs.cherrypy.org/stable/refman/wsgiserver/init.html.
 """
@@ -13,12 +13,15 @@ import sys
 from argparse import ArgumentParser
 from cherrypy import wsgiserver
 
+
 def serve(module_name, app_name, port, **kwargs):
-    """Given `module_name`, `app_name`, and `port`, import the module `module_name`, get its
-    attribute `app_name` (which should be a WSGI app), and serve it on port `port` with cherrypy."""
-    # Fork. If this is the parent process, os.fork() return's the child's process id,
-    # so the if loop evaluates to true and it quits. In the child process, os.fork() returns 0,
-    # so the child process keeps going.
+    """Given `module_name`, `app_name`, and `port`, import the module
+    `module_name`, get its attribute `app_name` (which should be a WSGI app),
+    and serve it on port `port` with cherrypy.
+    """
+    # Fork. If this is the parent process, os.fork() return's the child's
+    # process id, so the if loop evaluates to true and it quits. In the child
+    # process, os.fork() returns 0, so the child process keeps going.
     if os.fork():
         sys.exit()
     # Everything after here is only done by the child process:
@@ -30,22 +33,22 @@ def serve(module_name, app_name, port, **kwargs):
     # and then make a CherryPyWSGIServer with this information
     server = wsgiserver.CherryPyWSGIServer(('0.0.0.0', port), app)
     # print the port number and pid.
-    print("Serving on port %d, process ID is %d." %(port, os.getpid()))
+    print("Serving on port %d, process ID is %d." % (port, os.getpid()))
     # start the server.
     server.start()
 
 # create an argparse parser...
-parser = ArgumentParser(description="Run a WSGI application with CherryPy from the command line.",
-        add_help=True)
+parser = ArgumentParser(add_help=True,
+    description="Run a WSGI application with CherryPy from the command line.")
 
 parser.add_argument("module_name", type=str, nargs=1,
-        help="The name of the module where your application lives.")
+    help="The name of the module where your application lives.")
 
 parser.add_argument("app_name", type=str, nargs="?", default="app",
-        help="The name of your application, in `module_name`; defaults to 'app'.")
+    help="The name of your application, in `module_name`; defaults to 'app'.")
 
-parser.add_argument("--port", type=int, help="Port to serve on; defaults to 8080.", action="store",
-        nargs="?", default=8080)
+parser.add_argument("--port", type=int, nargs="?", default=8080,
+    help="Port to serve on; defaults to 8080.", action="store",)
 
 args = parser.parse_args()
 serve(**vars(args))
