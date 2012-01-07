@@ -14,7 +14,7 @@ from argparse import ArgumentParser
 from cherrypy import wsgiserver
 
 
-def serve(module_name, app_name, port, **kwargs):
+def serve(module_name, app_name, port):
     """Given `module_name`, `app_name`, and `port`, import the module
     `module_name`, get its attribute `app_name` (which should be a WSGI app),
     and serve it on port `port` with cherrypy.
@@ -22,7 +22,10 @@ def serve(module_name, app_name, port, **kwargs):
     # Fork. If this is the parent process, os.fork() return's the child's
     # process id, so the if loop evaluates to true and it quits. In the child
     # process, os.fork() returns 0, so the child process keeps going.
-    if os.fork():
+    pid = os.fork()
+    if pid:
+        # print the port number and pid.
+        print("Serving on port %d, process ID is %d." % (port, pid))
         sys.exit()
     # Everything after here is only done by the child process:
     # import the module from the string of the module name.
@@ -32,8 +35,6 @@ def serve(module_name, app_name, port, **kwargs):
     app = getattr(application_module, app_name)
     # and then make a CherryPyWSGIServer with this information
     server = wsgiserver.CherryPyWSGIServer(('0.0.0.0', port), app)
-    # print the port number and pid.
-    print("Serving on port %d, process ID is %d." % (port, os.getpid()))
     # start the server.
     server.start()
 
