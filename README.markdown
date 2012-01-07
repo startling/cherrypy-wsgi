@@ -3,6 +3,12 @@ I was using using [CherryPy][] and was frustrated that there wasn't a
 way to serve wsgi applications from the command line. So here it is.
 
 [CherryPy]: http://cherrypy.org/
+## Installation:
+You can clone/download and install the usual way, or install with pip directly
+from this repository:
+
+`pip install git+git://github.com/startling/cherrypy-wsgi.git`
+
 ## Usage
 ```
 usage: cherrypy-wsgi [-h] [--port [PORT]] module_name [app_name]
